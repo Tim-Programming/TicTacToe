@@ -9,6 +9,7 @@ private:
 	int number_of_boxes;
 public:
 	Play_field();
+	Play_field(int box_width, int number_of_boxes);
 	void draw_field();
 };
 
