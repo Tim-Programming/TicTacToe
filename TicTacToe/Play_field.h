@@ -4,6 +4,7 @@
 #include <vector>
 #include "Character.h"
 #include "common.h"
+#include <algorithm> // Für std::sort
 using namespace std;
 
 class Play_field
@@ -17,9 +18,12 @@ public:
 	Play_field(int box_width, int number_of_boxes);
 	void draw_field();
 	void add_character(Character character);
-	void show_all_characters();
-	int convert_position(Position position);
+	void show_characters();
+	void show_characters(vector<Character> characters);
+	int convert_x_y_position_into_number(Position position);
+	Position convert_number_into_x_y_position(int pos);
 	bool check_existing_position();
 	bool check_equal_position(Position position_A, Position position_B);
+	vector<Character> get_all_Characters_with_same_name(string search_name);
+	vector<Character> sort_ascending_by_position(vector<Character> characters);
 };
-

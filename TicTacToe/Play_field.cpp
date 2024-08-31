@@ -28,36 +28,9 @@ void Play_field::draw_field()
             
             else if ((i % (this->box_width - 1) == (this->box_width - 1) / 2) && (j % (this->box_width - 1) == (this->box_width - 1) / 2))
             {
-                /*for (int k = 0; k < participating_characters.size(); k++)
-                {
-                    int x = participating_characters.at(k).get_x_coordinate();
-                    int y = participating_characters.at(k).get_y_coordinate();
-                    int x_play_field = ((j / this->box_width) * number_of_boxes) / number_of_boxes;
-                    int y_play_field = ((i / this->box_width) * number_of_boxes) / number_of_boxes;
-                    if ((x == x_play_field) and (y == y_play_field))
-                    {
-                        cout << participating_characters.at(k).get_short_symbol() << " ";
-                        numbers.push_back(number);
-                    }
-                }
-                for (int l = 0; l < numbers.size(); l++)
-                {
-                    if (number == numbers.at(l))
-                    {
-                        flag_found_character = true;
-                    }
-                    else
-                    {
-                        flag_found_character = false;
-                    }
-                }
-                if (!flag_found_character)
-                {
-                    
-                }*/
                 for (int k = 0; k < participating_characters.size(); k++)
                 {
-                    int pos = convert_position(participating_characters.at(k).get_position());
+                    int pos = convert_x_y_position_into_number(participating_characters.at(k).get_position());
                     if (pos == number)
                     {
                         cout << participating_characters.at(k).get_short_symbol() << " ";
@@ -102,7 +75,7 @@ void Play_field::add_character(Character character)
     this->participating_characters.push_back(character);
 }
 
-void Play_field::show_all_characters() 
+void Play_field::show_characters() 
 {
     for (int i = 0; i < participating_characters.size(); i++)
     {
@@ -119,12 +92,38 @@ void Play_field::show_all_characters()
     }
 }
 
-int Play_field::convert_position(Position position)
+void Play_field::show_characters(vector<Character> characters)
+{
+    for (int i = 0; i < characters.size(); i++)
+    {
+        cout << endl;
+        cout << "**************************************************************************" << endl;
+        cout << "player " << i << ". is: " << characters.at(i).get_name() << endl;
+        cout << "and has following attributes: " << endl;
+        cout << "short name: " << characters.at(i).get_short_symbol() << endl;
+        cout << "id: " << characters.at(i).get_id() << endl;
+        cout << "score: " << characters.at(i).get_score() << endl;
+        cout << "Position: Pos(" << characters.at(i).get_x_coordinate() << "|" << characters.at(i).get_y_coordinate() << ")" << endl;
+        cout << "**************************************************************************" << endl;
+        cout << endl;
+    }
+}
+
+int Play_field::convert_x_y_position_into_number(Position position)
 {
     int x = position.get_x_coordinate();
     int y = position.get_y_coordinate();
     return  x + (this->number_of_boxes) * y;
 }
+
+Position Play_field::convert_number_into_x_y_position(int pos)
+{
+    int y = pos / this->number_of_boxes;
+    int x = pos-(number_of_boxes * y);
+    Position position(x,y);
+    return position;
+}
+
 
 bool Play_field::check_existing_position()
 {
@@ -139,8 +138,6 @@ bool Play_field::check_existing_position()
                 bool equaltiy = check_equal_position(position_old, position_new);
                 if (check_equal_position(position_old, position_new))
                 {
-                    cout << "(" << position_old.get_x_coordinate() << "|" << position_old.get_y_coordinate() << ")" << endl;
-                    cout << "Position exits already" << endl;
                     return true;
                 }
             }
@@ -152,4 +149,36 @@ bool Play_field::check_existing_position()
 bool Play_field::check_equal_position(Position position_A, Position position_B)
 {
     return(position_A.get_x_coordinate() == position_B.get_x_coordinate() and position_A.get_y_coordinate() == position_B.get_y_coordinate());
+}
+
+vector<Character> Play_field::get_all_Characters_with_same_name(string search_name)
+{
+    vector<Character> characters_by_name= {};
+    for (int i = 0; i < this->participating_characters.size(); i++)
+    {
+        if (participating_characters.at(i).get_name() == search_name)
+        {
+            characters_by_name.push_back(participating_characters.at(i));
+        }
+       
+    }
+    return characters_by_name;
+}
+
+vector<Character> Play_field::sort_ascending_by_position(vector<Character> characters)
+{
+    // Hilfsfunktion zum Vergleichen der Positionen
+    struct ComparePositions {
+        Play_field* play_field;
+        ComparePositions(Play_field* pf) : play_field(pf) {}
+
+        bool operator()(Character& a, Character& b) {
+            return play_field->convert_x_y_position_into_number(a.get_position()) < play_field->convert_x_y_position_into_number(b.get_position());
+        }
+    };
+
+    // Sortieren des Vektors
+    std::sort(characters.begin(), characters.end(), ComparePositions(this));
+
+    return characters;
 }
