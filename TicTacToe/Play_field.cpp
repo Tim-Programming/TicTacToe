@@ -165,6 +165,21 @@ vector<Character> Play_field::get_all_Characters_with_same_name(string search_na
     return characters_by_name;
 }
 
+vector<Character> Play_field::get_all_Characters_with_same_name(string search_name, vector<Character> characters_in)
+{
+    vector<Character> characters_by_name = {};
+    for (int i = 0; i < characters_in.size(); i++)
+    {
+        if (characters_in.at(i).get_name() == search_name)
+        {
+            characters_by_name.push_back(characters_in.at(i));
+        }
+
+    }
+    return characters_by_name;
+}
+
+
 vector<Character> Play_field::sort_ascending_by_position(vector<Character> characters)
 {
     // Hilfsfunktion zum Vergleichen der Positionen
@@ -181,4 +196,43 @@ vector<Character> Play_field::sort_ascending_by_position(vector<Character> chara
     std::sort(characters.begin(), characters.end(), ComparePositions(this));
 
     return characters;
+}
+
+int Play_field::get_number_of_boxes()
+{
+    return this->number_of_boxes;
+}
+
+void Play_field::set_number_of_boxes(int boxes)
+{
+    this->number_of_boxes = boxes;
+}
+
+vector<Character> Play_field::get_characters()
+{
+    return this->participating_characters;
+}
+
+vector<string> Play_field::get_names_of_characters_in_play_field(vector<Character> characters) 
+{
+    vector<string> names;
+    for (int i = 0; i < characters.size(); i++)
+    {
+        names.push_back(characters.at(i).get_name());
+    }
+
+    std::vector<string> list_without_multiple_occurrences = {};
+    
+
+    for (int j = 0; j < names.size(); j++)
+    {
+        string new_element = names.at(j);
+        if (std::find(list_without_multiple_occurrences.begin(), list_without_multiple_occurrences.end(), new_element) != list_without_multiple_occurrences.end()) {
+        }
+        else {
+            list_without_multiple_occurrences.push_back(new_element);
+        }
+    }
+
+    return list_without_multiple_occurrences;
 }

@@ -76,3 +76,5 @@ int Character::get_y_coordinate()
 	return this->position.get_y_coordinate();
 }
 
+
+
