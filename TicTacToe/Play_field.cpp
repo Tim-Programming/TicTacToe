@@ -11,59 +11,52 @@ Play_field::Play_field(int box_width_in, int number_of_boxes_in) : box_width(box
 void Play_field::draw_field()
 {
     cout << endl;
-    int number = 0;
-    vector<int> numbers = {};
-    bool flag_found_character = false;
+    int number = 1; // Startnummer für das erste Feld
+    vector<int> numbers; // Liste von befüllten Feldern
 
-    for (int i = 0; i < (this->box_width)*this->number_of_boxes - (this->number_of_boxes - 1); i++)
+    for (int i = 0; i < (this->box_width) * this->number_of_boxes - (this->number_of_boxes - 1); i++)
     {
-        // vertical
-        for (int j = 0; j < (this->box_width)*this->number_of_boxes - (this->number_of_boxes - 1); j++)
+        // Vertikale Schleife
+        for (int j = 0; j < (this->box_width) * this->number_of_boxes - (this->number_of_boxes - 1); j++)
         {
-            // horizontal
+            // Horizontale Schleife
             if (j % (this->box_width - 1) == 0 || i % (this->box_width - 1) == 0)
             {
                 cout << "* ";
             }
-            
             else if ((i % (this->box_width - 1) == (this->box_width - 1) / 2) && (j % (this->box_width - 1) == (this->box_width - 1) / 2))
             {
+                bool found_character = false;
+                // Überprüfen, ob ein Charakter auf der Position ist
                 for (int k = 0; k < participating_characters.size(); k++)
                 {
                     int pos = convert_x_y_position_into_number(participating_characters.at(k).get_position());
+                    pos++;
                     if (pos == number)
                     {
                         cout << participating_characters.at(k).get_short_symbol() << " ";
-                        numbers.push_back(number);
+                        found_character = true;
+                        break;
                     }
                 }
-                for (int l = 0; l < numbers.size(); l++)
+
+                if (!found_character)
                 {
-                    if (numbers.at(l) == number)
+                    if (number < 10)
                     {
-                        flag_found_character = true;
+                        cout << number << " ";
                     }
                     else
                     {
-                        flag_found_character = false;
+                        cout << number;  // Ohne zusätzliches Leerzeichen für zweiziffrige Zahlen
                     }
                 }
-                if (!flag_found_character)
-                {
-                    if (number >= 10 - 1)
-                    {
-                        cout << number + 1 << "";
-                    }
-                    else
-                    {
-                        cout << number + 1 << " ";
-                    }
-                }
-                number++;
+
+                number++; // Die Nummer für das nächste Feld erhöhen
             }
             else
             {
-                cout << "  ";
+                cout << "  ";  // Leeres Feld
             }
         }
         cout << endl;
@@ -124,24 +117,29 @@ Position Play_field::convert_number_into_x_y_position(int pos)
     return position;
 }
 
+bool Play_field::is_position_occupied(Position position) {
+    int pos_to_check = convert_x_y_position_into_number(position);
+    for (const auto& character : participating_characters) {
+        int existing_pos = convert_x_y_position_into_number(character.get_position());
+        if (pos_to_check == existing_pos) {
+            return true; // Position ist bereits belegt
+        }
+    }
+    return false; // Position ist frei
+}
+
 
 bool Play_field::check_existing_position()
 {
-    for (int i = 0; i < this->participating_characters.size(); i++)
-    { 
-        Position position_old = participating_characters.at(i).get_position();
-        for (int j = 0; j < this->participating_characters.size(); j++)
+    std::set<int> positions;
+    for (const auto& character : participating_characters)
+    {
+        int pos = convert_x_y_position_into_number(character.get_position());
+        if (positions.find(pos) != positions.end())
         {
-            if (i != j)
-            {
-                Position position_new = participating_characters.at(j).get_position();
-                bool equaltiy = check_equal_position(position_old, position_new);
-                if (check_equal_position(position_old, position_new))
-                {
-                    return true;
-                }
-            }
+            return true; // Duplikat gefunden
         }
+        positions.insert(pos);
     }
     return false;
 }

@@ -15,6 +15,7 @@ public:
 	Patterns();
 	void set_characters(vector<Character> characters_in);
 	void show_characters();
+	bool found_matches_in_line(int number_of_boxes, vector<Character> characters, bool is_horizontal);
 	bool found_matches_horizontal_for_player(int numberOf_boxes, vector<Character> characters);
 	bool found_matches_vertical_for_player(int numberOf_boxes, vector<Character> characters);
 	bool found_matches_diagonal_for_player(int numberOf_boxes, vector<Character> characters);

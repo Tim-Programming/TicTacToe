@@ -16,128 +16,133 @@ void Patterns::show_characters()
 	play_field.show_characters(characters);
 }
 
-bool Patterns::found_matches_horizontal_for_player(int number_of_boxes, vector<Character> characters_in)
-{
-	this->match_horizontal = true;
-	Play_field play_field;
-	vector<Character> sorted_by_postion = play_field.sort_ascending_by_position(characters_in);
+bool Patterns::found_matches_in_line(int number_of_boxes, vector<Character> characters, bool is_horizontal) {
+	for (int i = 0; i < number_of_boxes; i++) {
+		int consecutive_count = 0;
 
-	if (sorted_by_postion.size() == 0)
-	{
-		this->match_horizontal = false;
-		return false;
-	}
+		for (int j = 0; j < number_of_boxes; j++) {
+			Position current_pos = is_horizontal ? Position(j, i) : Position(i, j);
 
-	int y_sum = 0;
-	for (int j = 0; j < sorted_by_postion.size(); j++)
-	{
-		y_sum += sorted_by_postion.at(j).get_y_coordinate();
-		if (j != sorted_by_postion.at(j).get_x_coordinate())
-		{
-			this->match_horizontal = false;
-			return false;
-		}
-	}
+			bool found = std::any_of(characters.begin(), characters.end(),
+				[&current_pos](const Character& character) {
+					return character.get_position().get_x_coordinate() == current_pos.get_x_coordinate() &&
+						character.get_position().get_y_coordinate() == current_pos.get_y_coordinate();
+				});
 
-	if (y_sum % number_of_boxes != 0)
-	{
-		this->match_horizontal = false;
-		return false;
-	}
-
-	return true;
-}
-
-
-bool Patterns::found_matches_vertical_for_player(int number_of_boxes, vector<Character> characters_in)
-{
-	this->match_vertical = true;
-	Play_field play_field;
-	vector<Character> sorted_by_postion = play_field.sort_ascending_by_position(characters_in);
-
-	if (sorted_by_postion.size() == 0)
-	{
-		this->match_vertical = false;
-		return false;
-	}
-
-	int x_sum = 0;
-	for (int j = 0; j < sorted_by_postion.size(); j++)
-	{
-		x_sum += sorted_by_postion.at(j).get_x_coordinate();
-		if (j != sorted_by_postion.at(j).get_y_coordinate())
-		{
-			this->match_vertical = false;
-			return false;
-		}
-	}
-
-	if (x_sum % number_of_boxes != 0)
-	{
-		this->match_vertical = false;
-		return false;
-	}
-
-	return true;
-}
-bool Patterns::found_matches_diagonal_for_player(int number_of_boxes, vector<Character> characters_in)
-{
-	this->match_diagonal = true;
-	Play_field play_field;
-	vector<Character> sorted_by_position = play_field.sort_ascending_by_position(characters_in);
-
-	if (sorted_by_position.size() == 0)
-	{
-		this->match_diagonal = false;
-		return false;
-	}
-
-	// Check for top-left to bottom-right diagonal
-	bool top_left_to_bottom_right = true;
-	for (int j = 0; j < number_of_boxes; j++)
-	{
-		bool found = false;
-		for (auto& character : sorted_by_position)
-		{
-			if (character.get_x_coordinate() == j && character.get_y_coordinate() == j)
-			{
-				found = true;
-				break;
+			if (found) {
+				consecutive_count++;
+				if (consecutive_count == number_of_boxes) {
+					return true; // Match gefunden
+				}
+			}
+			else {
+				consecutive_count = 0;
 			}
 		}
-		if (!found)
-		{
-			top_left_to_bottom_right = false;
-			break;
-		}
 	}
+	return false; // Kein Match gefunden
+}
 
-	// Check for top-right to bottom-left diagonal
-	bool top_right_to_bottom_left = true;
-	for (int j = 0; j < number_of_boxes; j++)
-	{
-		bool found = false;
-		for (auto& character : sorted_by_position)
-		{
-			if (character.get_x_coordinate() == j && character.get_y_coordinate() == number_of_boxes - 1 - j)
-			{
-				found = true;
-				break;
+
+bool Patterns::found_matches_horizontal_for_player(int number_of_boxes, vector<Character> characters) {
+	// Sortiere die Charaktere nach ihrer Position
+	sort(characters.begin(), characters.end(), [](Character& a, Character& b) {
+		return a.get_position().get_x_coordinate() < b.get_position().get_x_coordinate();
+		});
+
+	// Durchlaufe jede Zeile
+	for (int row = 0; row < number_of_boxes; row++) {
+		int consecutive_count = 0;
+
+		// Durchlaufe jede Spalte der aktuellen Zeile
+		for (int col = 0; col < number_of_boxes; col++) {
+			Position current_pos(col, row);
+
+			bool found = false;
+			// Überprüfe, ob ein Charakter in der aktuellen Position ist
+			for (auto& character : characters) {
+				if (character.get_position().get_x_coordinate() == current_pos.get_x_coordinate() &&
+					character.get_position().get_y_coordinate() == current_pos.get_y_coordinate()) {
+					found = true;
+					break;
+				}
+			}
+
+			if (found) {
+				consecutive_count++;
+				if (consecutive_count == number_of_boxes) {
+					return true; // Ein vollständiges Match wurde gefunden
+				}
+			}
+			else {
+				consecutive_count = 0; // Setze den Zähler zurück, wenn das aktuelle Feld nicht besetzt ist
 			}
 		}
-		if (!found)
-		{
-			top_right_to_bottom_left = false;
-			break;
+	}
+	return false; // Kein vollständiges horizontales Match gefunden
+}
+
+bool Patterns::found_matches_vertical_for_player(int number_of_boxes, vector<Character> characters) {
+    return found_matches_in_line(number_of_boxes, characters, false);
+}
+
+bool Patterns::found_matches_diagonal_for_player(int number_of_boxes, vector<Character> characters) {
+	// Überprüfe Hauptdiagonale (von oben links nach unten rechts)
+	for (int start = 0; start < number_of_boxes; start++) {
+		int consecutive_count = 0;
+
+		// Diagonale von oben links nach unten rechts
+		for (int row = start, col = 0; row < number_of_boxes && col < number_of_boxes; row++, col++) {
+			Position current_pos(col, row);
+			bool found = false;
+			for (auto& character : characters) {
+				if (character.get_position().get_x_coordinate() == current_pos.get_x_coordinate() &&
+					character.get_position().get_y_coordinate() == current_pos.get_y_coordinate()) {
+					found = true;
+					break;
+				}
+			}
+
+			if (found) {
+				consecutive_count++;
+				if (consecutive_count == number_of_boxes) {
+					return true; // Match gefunden
+				}
+			}
+			else {
+				consecutive_count = 0;
+			}
 		}
 	}
 
-	if (!top_left_to_bottom_right && !top_right_to_bottom_left)
-	{
-		this->match_diagonal = false;
-		return false;
-	}
+	// Überprüfe Nebendiagonale (von unten links nach oben rechts)
+	for (int start = 1; start < number_of_boxes; start++) {
+		int consecutive_count = 0;
 
-	return true;
+		// Diagonale von unten links nach oben rechts
+		for (int row = start, col = 0; row >= 0 && col < number_of_boxes; row--, col++) {
+			Position current_pos(col, row);
+			bool found = false;
+			for (auto& character : characters) {
+				if (character.get_position().get_x_coordinate() == current_pos.get_x_coordinate() &&
+					character.get_position().get_y_coordinate() == current_pos.get_y_coordinate()) {
+					found = true;
+					break;
+				}
+			}
+
+			if (found) {
+				consecutive_count++;
+				if (consecutive_count == number_of_boxes) {
+					return true; // Match gefunden
+				}
+			}
+			else {
+				consecutive_count = 0;
+			}
+		}
+	}
+	return false; // Kein Match gefunden
 }
+
 

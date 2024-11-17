@@ -17,6 +17,7 @@ public:
 	void add_character(Character character);
 	void show_characters();
 	void show_characters(vector<Character> characters);
+	bool is_position_occupied(Position position);
 	int convert_x_y_position_into_number(Position position);
 	Position convert_number_into_x_y_position(int pos);
 	bool check_existing_position();
