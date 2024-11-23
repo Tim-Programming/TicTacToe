@@ -128,25 +128,12 @@ bool Play_field::is_position_occupied(Position position) {
     return false; // Position ist frei
 }
 
+bool Play_field::are_all_fields_occupied() const {
+    // Anzahl der Felder im Spielfeld
+    int total_fields = number_of_boxes * number_of_boxes;
 
-bool Play_field::check_existing_position()
-{
-    std::set<int> positions;
-    for (const auto& character : participating_characters)
-    {
-        int pos = convert_x_y_position_into_number(character.get_position());
-        if (positions.find(pos) != positions.end())
-        {
-            return true; // Duplikat gefunden
-        }
-        positions.insert(pos);
-    }
-    return false;
-}
-
-bool Play_field::check_equal_position(Position position_A, Position position_B)
-{
-    return(position_A.get_x_coordinate() == position_B.get_x_coordinate() and position_A.get_y_coordinate() == position_B.get_y_coordinate());
+    // Wenn die Anzahl der Charaktere gleich der Gesamtzahl der Felder ist, sind alle Felder belegt
+    return participating_characters.size() == total_fields;
 }
 
 vector<Character> Play_field::get_all_Characters_with_same_name(string search_name)
@@ -175,25 +162,6 @@ vector<Character> Play_field::get_all_Characters_with_same_name(string search_na
 
     }
     return characters_by_name;
-}
-
-
-vector<Character> Play_field::sort_ascending_by_position(vector<Character> characters)
-{
-    // Hilfsfunktion zum Vergleichen der Positionen
-    struct ComparePositions {
-        Play_field* play_field;
-        ComparePositions(Play_field* pf) : play_field(pf) {}
-
-        bool operator()(Character& a, Character& b) {
-            return play_field->convert_x_y_position_into_number(a.get_position()) < play_field->convert_x_y_position_into_number(b.get_position());
-        }
-    };
-
-    // Sortieren des Vektors
-    std::sort(characters.begin(), characters.end(), ComparePositions(this));
-
-    return characters;
 }
 
 int Play_field::get_number_of_boxes()
