@@ -6,7 +6,7 @@ class Character
 {
 private:
 	string name;
-	char short_symobl;
+	char short_symbol;
 	int id;
 	int score;
 	Position position;
@@ -21,12 +21,12 @@ public:
 	void set_position(Position position);
 
 	// Get-Methods
-	string get_name();
-	char get_short_symbol();
-	int get_id();
-	int get_score();
-	Position get_position();
-	int get_x_coordinate();
-	int get_y_coordinate();
+	string get_name() const;
+	char get_short_symbol() const;
+	int get_id() const;
+	int get_score() const;
+	Position get_position() const;
+	int get_x_coordinate() const;
+	int get_y_coordinate() const;
 };
 
