@@ -1,6 +1,8 @@
 # TicTacToe
 
-![Preview TicTacToe](TicTacToe_preview.png)
+## Example
+
+![Example Play Round](TicTacToe_play_round.gif)
 
 In this TicTacToe game you can enter the number of boxes (size of the play field) and the usernames of the two players. When all fields are occupied then the program ends with a tie.
 
